@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  pwa:
+    container_name: pwa-pouchdb-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - '80:80'
+    environment:
+      - NODE_ENV=development
+  # couchdb:
+  #   container_name: couchdb
+  #   hostname: couchdb.local
+  #   image: 'apache/couchdb:${DOCKER_TAG:-latest}'
+  #   environment:
+  #       - 'COUCHDB_USER=admin'
+  #       - 'COUCHDB_PASSWORD=secret'
+  #   volumes:
+  #       - '~/data:/opt/couchdb/data'
+  #   ports:
+  #       - '5984:5984'
