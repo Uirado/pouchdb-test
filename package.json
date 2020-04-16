@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start:pwa": "ng build && http-server -p 4200 -c-1 dist/pwa-pouchdb",
+    "start:pwa": "ng build --prod && http-server -p 4200 -c-1 dist/pwa-pouchdb",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
