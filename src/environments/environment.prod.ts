@@ -1,4 +1,6 @@
 export const environment = {
   production: true,
-  couchDbUrl: 'http://localhost:5984',
+  couchdbURL: 'http://localhost:5984',
+  couchdbUsername: 'admin',
+  couchdbPassword: 'admin',
 };

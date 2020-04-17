@@ -10,50 +10,59 @@ import { environment } from 'src/environments/environment';
 })
 export class RepositoryService {
 
-  private localDB: PouchDB.Database<TimelineEvent>;
-  private remoteDB: PouchDB.Database<TimelineEvent>;
+  private dbConfig: PouchDB.Configuration.RemoteDatabaseConfiguration = {
+    auth: {
+      username: environment.couchdbUsername,
+      password: environment.couchdbPassword,
+    }
+  };
 
-  private changes$ = new Subject<PouchDB.Core.ChangesResponseChange<TimelineEvent>>();
+  private db: PouchDB.Database<TimelineEvent>;
+  private syncReplication: PouchDB.Replication.Sync<TimelineEvent>;
+
+  private syncChanges$ = new Subject<any>();
+  private syncPaused$ = new Subject<any>();
 
   constructor() {}
 
   public connect(databaseName: string) {
-    this.localDB = new PouchDB<TimelineEvent>(databaseName);
-    this.remoteDB = new PouchDB<TimelineEvent>(`${environment.couchDbUrl}/${databaseName}`);
+    this.db = new PouchDB<TimelineEvent>(databaseName, { ...this.dbConfig });
+    this.syncReplication = this.db.sync(`${environment.couchdbURL}/${databaseName}`, { live: true, retry: true });
 
-    this.localDB.sync(this.remoteDB, { live: true, retry: true });
-
-    this.localDB.changes({ since: 'now', live: true, include_docs: true })
-      .on('change', (change) => console.log(change));
+    this.startListening();
   }
 
-  onChanges(): Observable<PouchDB.Core.ChangesResponseChange<TimelineEvent>> {
-    return this.changes$.asObservable().pipe(
-      tap(console.log),
-    );
+  private startListening() {
+    this.syncReplication
+      .on('active', () =>  console.log('Sync started'))
+      .on('change', info => this.syncChanges$.next(info))
+      .on('paused', info => this.syncPaused$.next(info))
+      .on('denied', () => console.log('Sync denied'))
+      .on('error', () => console.log('Sync error'))
+      .on('complete', () => console.log('Sync cancelled'));
   }
 
   getLiveList(): Observable<PouchDB.Core.ExistingDocument<TimelineEvent>[]> {
     return merge(
       this.getList(),
-      this.onChanges().pipe(
+      this.syncChanges$.pipe(
+        switchMapTo(this.syncPaused$),
         switchMapTo(this.getList()),
       ),
     );
   }
 
   getList(): Observable<PouchDB.Core.ExistingDocument<TimelineEvent>[]> {
-    return from(this.localDB.allDocs({ include_docs: true })).pipe(
-      map(({ rows }) => rows.map(({ doc }) => doc)),
-      tap(console.log)
+    return from(this.db.allDocs({include_docs: true})).pipe(
+      map(allDocs => allDocs.rows.map(row => row.doc)),
     );
   }
 
   create(item: TimelineEvent) {
-    this.localDB.post<TimelineEvent>(item);
+    this.db.post<TimelineEvent>(item);
   }
 
   delete(docMeta: PouchDB.Core.ExistingDocument<TimelineEvent>) {
-    this.localDB.remove(docMeta);
+    this.db.remove(docMeta);
   }
 }

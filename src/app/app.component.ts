@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RepositoryService } from './service/repository.service';
 import { Observable } from 'rxjs';
 import { TimelineEvent } from './model/timeline-event.model';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +20,9 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.eventList = this.repository.getLiveList();
+    this.eventList = this.repository.getLiveList().pipe(
+      tap(console.log),
+    );
   }
 
   addRow() {
