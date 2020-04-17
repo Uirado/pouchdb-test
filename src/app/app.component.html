@@ -1,2 +1,52 @@
-sdfadf
+<button (click)="addRow()">Add row</button>
+
+<table style="border-collapse: collapse; width: 100%" border="1">
+  <tr>
+    <th></th>
+    <th>Data 01</th>
+    <th>Data 02</th>
+    <th>Data 03</th>
+    <th>Data 04</th>
+    <th>Data 05</th>
+    <th>Data 06</th>
+    <th>Data 07</th>
+    <th>Data 08</th>
+    <th>Data 09</th>
+    <th>Data 10</th>
+    <th>Data 11</th>
+    <th>Data 12</th>
+    <th>Data 13</th>
+    <th>Data 14</th>
+    <th>Data 15</th>
+    <th>Data 16</th>
+    <th>Data 17</th>
+    <th>Data 18</th>
+    <th>Data 19</th>
+    <th>Data 20</th>
+  </tr>
+  <tr *ngFor="let event of eventList | async">
+    <td><button (click)="deleteRow(event)">delete</button></td>
+    <td>{{ event.data01 }}</td>
+    <td>{{ event.data02 }}</td>
+    <td>{{ event.data03 }}</td>
+    <td>{{ event.data04 }}</td>
+    <td>{{ event.data05 }}</td>
+    <td>{{ event.data06 }}</td>
+    <td>{{ event.data07 }}</td>
+    <td>{{ event.data08 }}</td>
+    <td>{{ event.data09 }}</td>
+    <td>{{ event.data10 }}</td>
+    <td>{{ event.data11 }}</td>
+    <td>{{ event.data12 }}</td>
+    <td>{{ event.data13 }}</td>
+    <td>{{ event.data14 }}</td>
+    <td>{{ event.data15 }}</td>
+    <td>{{ event.data16 }}</td>
+    <td>{{ event.data17 }}</td>
+    <td>{{ event.data18 }}</td>
+    <td>{{ event.data19 }}</td>
+    <td>{{ event.data20 }}</td>
+  </tr>
+</table>
+
 <router-outlet></router-outlet>
