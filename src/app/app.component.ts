@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RepositoryService } from './service/repository.service';
 import { Observable } from 'rxjs';
 import { TimelineEvent } from './model/timeline-event.model';
-import { tap } from 'rxjs/operators';
+import { tap, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -11,26 +11,43 @@ import { tap } from 'rxjs/operators';
 })
 export class AppComponent implements OnInit {
 
-  eventList: Observable<TimelineEvent[]>;
+  list: PouchDB.Core.ExistingDocument<TimelineEvent>[];
 
   constructor(
     private readonly repository: RepositoryService,
+    private readonly changeDetector: ChangeDetectorRef,
   ) {
     this.repository.connect('wtx02-jmpid-12345');
   }
 
   ngOnInit() {
-    this.eventList = this.repository.getLiveList().pipe(
-      tap(console.log),
-    );
+    this.repository.getList().subscribe(list => this.list = list);
+
+    this.repository.onDBChanges()
+      .subscribe(() => {
+        this.repository.getList().subscribe(list => {
+          this.list = list;
+          this.changeDetector.detectChanges();
+        });
+      });
   }
 
   addRow() {
+    // const a = []
+    // for (let i = 0; i < 100; i++) {
+    //   a.push(createRandomTimelineEvent());
+    // }
+
+    // this.repository.bulkCreate(a);
     this.repository.create(createRandomTimelineEvent());
   }
 
   deleteRow(event: PouchDB.Core.ExistingDocument<TimelineEvent>) {
     this.repository.delete(event);
+  }
+
+  trackEvent(index: number, event: PouchDB.Core.ExistingDocument<TimelineEvent>) {
+    return event._id;
   }
 }
 
@@ -57,5 +74,8 @@ function createRandomTimelineEvent(): TimelineEvent {
     data18: `${Math.floor(Math.random() * size)}`,
     data19: `${Math.floor(Math.random() * size)}`,
     data20: `${Math.floor(Math.random() * size)}`,
+    newData1: `${Math.floor(Math.random() * size)}`,
+    newData2: `${Math.floor(Math.random() * size)}`,
+    newData3: `${Math.floor(Math.random() * size)}`,
   };
 }

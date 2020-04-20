@@ -19,4 +19,7 @@ export interface TimelineEvent {
     data18?: string;
     data19?: string;
     data20?: string;
+    newData1?: string;
+    newData2?: string;
+    newData3?: string;
 }

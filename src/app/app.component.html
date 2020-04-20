@@ -3,6 +3,7 @@
 <table style="border-collapse: collapse; width: 100%" border="1">
   <tr>
     <th></th>
+    <th>Numero</th>
     <th>Data 01</th>
     <th>Data 02</th>
     <th>Data 03</th>
@@ -23,9 +24,13 @@
     <th>Data 18</th>
     <th>Data 19</th>
     <th>Data 20</th>
+    <th>New Data 1</th>
+    <th>New Data 2</th>
+    <th>New Data 3</th>
   </tr>
-  <tr *ngFor="let event of eventList | async">
+  <tr *ngFor="let event of list; let i = index; trackBy: trackEvent">
     <td><button (click)="deleteRow(event)">delete</button></td>
+    <td>{{ i + 1 }}</td>
     <td>{{ event.data01 }}</td>
     <td>{{ event.data02 }}</td>
     <td>{{ event.data03 }}</td>
@@ -46,6 +51,9 @@
     <td>{{ event.data18 }}</td>
     <td>{{ event.data19 }}</td>
     <td>{{ event.data20 }}</td>
+    <td>{{ event.newData1 }}</td>
+    <td>{{ event.newData2 }}</td>
+    <td>{{ event.newData3 }}</td>
   </tr>
 </table>
 
